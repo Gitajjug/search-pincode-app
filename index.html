@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Pincode Finder - Fast & Free Postal Code Search</title>
+    <meta name="description" content="A free and fast tool to find the Pincode (Postal Code) of any city, town, or village in India. Search by location name or by Pincode.">
+    <meta name="keywords" content="pincode finder, india post, postal code, indian pincode, post office search">
+            <style>
+        /* --- Revised Modern UI/UX - Version 2 --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --background: #f8fafc; /* Very light gray, almost white */
+            --foreground: #0f172a; /* Near-black for high contrast */
+            --primary: #f97316;      /* Energetic Orange for buttons */
+            --primary-hover: #ea580c;
+            --subtle-border: #e2e8f0;
+            --card-background: #ffffff;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b; /* Slightly softer black for the title */
+        }
+
+        p {
+            color: #64748b;
+            font-size: 1.125rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        /* --- REVISED Radio Button Styling --- */
+        .search-type {
+            display: flex;
+            justify-content: center;
+            gap: 25px; /* More space between the options */
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        .search-type label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between radio button and text */
+            color: #334155;
+            font-weight: 500;
+        }
+        .search-type input[type="radio"] {
+            /* Use modern accent color for the radio button itself */
+            accent-color: var(--primary); 
+            width: 1.15em;
+            height: 1.15em;
+        }
+
+        /* --- Search Area --- */
+        .search-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 14px 18px;
+            font-size: 1rem;
+            border: 1px solid var(--subtle-border);
+            border-radius: 8px;
+            background-color: var(--card-background);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+
+        #searchButton {
+            padding: 14px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #searchButton:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* --- Results Area --- */
+        #resultsContainer {
+            text-align: left;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background-color: var(--card-background);
+            border: 1px solid var(--subtle-border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+        }
+        .result-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.25rem;
+            color: var(--foreground);
+        }
+        .result-card p {
+            margin: 4px 0;
+            font-size: 1rem;
+            color: #475569;
+        }
+        .result-card .pincode {
+            font-weight: 600;
+            color: #1e40af; /* A strong, readable blue for the pincode */
+            font-size: 1.1rem;
+        }
+
+        /* --- Loader and Messages --- */
+        .loader {
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #message {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #dc2626; /* A standard, clear error red */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>India Pincode Finder</h1>
+        <p>Find postal codes by location, or find locations by postal code.</p>
+
+        <!-- NEW: Search Type Selection -->
+        <div class="search-type">
+            <label>
+                <input type="radio" id="searchByName" name="searchType" value="name" checked>
+                Search by Location
+            </label>
+            <label>
+                <input type="radio" id="searchByPincode" name="searchType" value="pincode">
+                Search by Pincode
+            </label>
+        </div>
+
+        <div class="search-area">
+            <input type="text" id="searchInput" placeholder="e.g., New Delhi...">
+            <button id="searchButton">Find</button>
+        </div>
+
+        <div id="resultsContainer">
+             <!-- Results will be injected here by JavaScript -->
+        </div>
+
+        <div class="loader" id="loader"></div>
+        <p id="message"></p>
+
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loader = document.getElementById('loader');
+        const messageEl = document.getElementById('message');
+        
+        // --- NEW: Get references to radio buttons ---
+        const searchByNameRadio = document.getElementById('searchByName');
+        const searchByPincodeRadio = document.getElementById('searchByPincode');
+        
+        // --- NEW: Logic to change placeholder text ---
+        document.querySelectorAll('input[name="searchType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'pincode') {
+                    searchInput.placeholder = 'e.g., 110001';
+                } else {
+                    searchInput.placeholder = 'e.g., New Delhi...';
+                }
+                searchInput.value = ''; // Clear input on mode change
+                resultsContainer.innerHTML = ''; // Clear results on mode change
+                messageEl.textContent = ''; // Clear messages on mode change
+            });
+        });
+
+        const API_BASE_URL = 'https://api.postalpincode.in/';
+
+        // --- UPDATED: Function to perform the search ---
+        const findPincode = async () => {
+            const searchTerm = searchInput.value.trim();
+
+            if (!searchTerm) {
+                messageEl.textContent = 'Please enter a value to search.';
+                return;
+            }
+            
+            // Reset UI for new search
+            resultsContainer.innerHTML = '';
+            messageEl.textContent = '';
+            loader.style.display = 'block';
+
+            let apiUrl = '';
+
+            // --- NEW: Check which radio button is selected and build the correct URL ---
+            if (searchByPincodeRadio.checked) {
+                // Pincode validation: must be exactly 6 digits
+                if (!/^\d{6}$/.test(searchTerm)) {
+                    messageEl.textContent = 'Please enter a valid 6-digit Pincode.';
+                    loader.style.display = 'none';
+                    return;
+                }
+                apiUrl = `${API_BASE_URL}pincode/${searchTerm}`;
+            } else {
+                apiUrl = `${API_BASE_URL}postoffice/${searchTerm}`;
+            }
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                const data = await response.json();
+
+                if (data && data.length > 0 && data[0].Status === 'Success') {
+                    displayResults(data[0].PostOffice);
+                } else {
+                    messageEl.textContent = data[0].Message || 'No results found. Please try a different search term.';
+                }
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                messageEl.textContent = 'An error occurred. Please check your connection and try again.';
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+        
+        // This function remains the same as it handles the data structure which is consistent
+        const displayResults = (postOffices) => {
+            if (postOffices.length === 0) {
+                 messageEl.textContent = 'No results found for this search.';
+                 return;
+            }
+            
+            postOffices.forEach(office => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                card.innerHTML = `
+                    <h3>${office.Name}</h3>
+                    <p><strong>District:</strong> ${office.District}</p>
+                    <p><strong>State:</strong> ${office.State}</p>
+                    <p class="pincode"><strong>Pincode:</strong> ${office.Pincode}</p>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        };
+
+        // Event Listeners
+        searchButton.addEventListener('click', findPincode);
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                findPincode();
+            }
+        });
+
+    </script>
+
+</body>
+</html>
